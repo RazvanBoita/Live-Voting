@@ -1,0 +1,59 @@
+@page "/signup"
+@using LiveVoting.Shared.Models
+@inject HttpClient HttpClient
+@inject ILogger<Signup> Logger
+
+<h3>Sign Up</h3>
+
+<EditForm Model="@signupModel" OnValidSubmit="HandleValidSubmit" FormName="signup-form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" @bind-Value="signupModel.Email" class="form-control"/>
+    </div>
+    
+    <div class="form-group">
+        <label for="firstname">First Name:</label>
+        <InputText id="firstname" @bind-Value="signupModel.FirstName" class="form-control"/>
+    </div>
+
+    <div class="form-group">
+        <label for="surname">Surname:</label>
+        <InputText id="surname" @bind-Value="signupModel.Surname" class="form-control"/>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <InputText id="password" @bind-Value="signupModel.Password" class="form-control" type="password"/>
+    </div>
+
+    <div class="form-group">
+        <label for="cnp">CNP(Cod numeric personal):</label>
+        <InputText id="cnp" @bind-Value="signupModel.Cnp" class="form-control"/>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Sign Up</button>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    private SignupModel signupModel { get; set; } = new ();
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var response = await HttpClient.PostAsJsonAsync("/api/Signup", signupModel);
+            // response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("Response status: " + response.StatusCode);
+            Console.WriteLine("Response body: " + responseBody);
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine($"Error: {e.Message}");
+        }
+    }
+}

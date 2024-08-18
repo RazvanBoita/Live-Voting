@@ -1,0 +1,6 @@
+@LiveVoting.Server_HostAddress = http://localhost:5005
+
+GET {{LiveVoting.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
