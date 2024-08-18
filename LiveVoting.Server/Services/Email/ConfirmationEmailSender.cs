@@ -6,7 +6,6 @@ public class ConfirmationEmailSender : IConfirmationEmailSender
     {
         try
         {
-            // var apiKey = "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";
             // var client = new SendGridClient(apiKey);
             // var from = new EmailAddress("razvanboita1609@gmail.com", "Election.ro");
             // var subject = "Confirm your account on ElectiOnline";
