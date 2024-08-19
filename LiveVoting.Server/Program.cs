@@ -18,6 +18,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient",
@@ -28,6 +30,8 @@ builder.Services.AddCors(options =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("LocalDb");
+
+Console.WriteLine("Connection string: " + connectionString);
 
 builder.Services.AddDbContext<VotingDbContext>(options =>
 {
