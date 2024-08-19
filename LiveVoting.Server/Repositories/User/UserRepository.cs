@@ -5,12 +5,13 @@ namespace LiveVoting.Server.Repositories.User;
 public class UserRepository : IUserRepository
 {
     private readonly VotingDbContext _dbContext;
+
     public UserRepository(VotingDbContext dbContext)
     {
         _dbContext = dbContext;
     }
-    
-    
+
+
     public Models.User? GetUserById(Guid userId)
     {
         return _dbContext.Users.Find(userId);
@@ -60,4 +61,27 @@ public class UserRepository : IUserRepository
 
         return true;
     }
+
+    public bool ConfirmEmailForUser(Models.User user)
+    {
+        try
+        {
+            user.ConfirmedEmail = true;
+            // _dbContext.Users.Update(user);
+            _dbContext.SaveChanges();
+        }
+        catch (Exception)
+        {
+            user.ConfirmedEmail = false;
+            _dbContext.SaveChanges();
+            return false;
+        }
+
+        return true;
+    }
+
+    public Models.User? GetUserByCnp(string cnp){
+        return _dbContext.Users.FirstOrDefault(u => u.CNP == cnp);
+    }
+
 }

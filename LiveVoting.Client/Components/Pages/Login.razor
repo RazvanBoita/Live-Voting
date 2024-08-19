@@ -1,0 +1,68 @@
+@page "/login"
+@using LiveVoting.Shared.Models
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<h3>Login</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @((MarkupString)errorMessage)
+    </div>
+}
+
+<EditForm Model="@loginModel" OnValidSubmit="HandleValidSubmit" FormName="login-form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" @bind-Value="loginModel.Email" class="form-control" />
+    </div>
+    
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <InputText id="password" @bind-Value="loginModel.Password" class="form-control" type="password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Log In</button>
+    <p>Don't have an account yet? <NavLink href="/signup">Sign up</NavLink></p>
+    
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    private LoginModel loginModel { get; set; } = new();
+
+    private string errorMessage = string.Empty;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            errorMessage = string.Empty;
+
+            // Here you would typically send a request to your login API
+            var response = await HttpClient.PostAsJsonAsync("/api/login", loginModel);
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                errorMessage = $"Login failed: {responseBody}";
+            }
+            else
+            {
+                // Handle successful login
+                Console.WriteLine("Login successful!");
+                NavigationManager.NavigateTo("/");
+                // You might want to navigate to a dashboard or home page after login
+            }
+        }
+        catch (HttpRequestException e)
+        {
+            errorMessage = $"Error: {e.Message}";
+        }
+        StateHasChanged();
+    }
+}

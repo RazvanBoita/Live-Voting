@@ -8,4 +8,6 @@ public interface IUserRepository
     public bool UserExistsByEmail(string emailAddress);
     public bool InsertUser(Models.User user);
     public bool DeleteUser(Models.User user);
+    public bool ConfirmEmailForUser(Models.User user);
+    public Models.User? GetUserByCnp(string cnp);
 }

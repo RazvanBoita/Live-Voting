@@ -2,18 +2,35 @@
 @using LiveVoting.Shared.Models
 @inject HttpClient HttpClient
 @inject ILogger<Signup> Logger
+@inject NavigationManager NavigationManager
 
 <h3>Sign Up</h3>
+
+@if (isSignupSuccessful)
+{
+    <div class="alert alert-success" role="alert">
+        <p>We sent you a confirmation email! Make sure to click the link provided to verify your account!</p>
+        <p>Confirmed your account? You can now <NavLink href="/login">log in</NavLink>.</p>
+    </div>
+}
+else
+{
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+<div class="alert alert-danger" role="alert">
+    @((MarkupString)errorMessage)
+</div>
+}
 
 <EditForm Model="@signupModel" OnValidSubmit="HandleValidSubmit" FormName="signup-form">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    
+
     <div class="form-group">
         <label for="email">Email:</label>
         <InputText id="email" @bind-Value="signupModel.Email" class="form-control"/>
     </div>
-    
+
     <div class="form-group">
         <label for="firstname">First Name:</label>
         <InputText id="firstname" @bind-Value="signupModel.FirstName" class="form-control"/>
@@ -30,30 +47,45 @@
     </div>
 
     <div class="form-group">
-        <label for="cnp">CNP(Cod numeric personal):</label>
+        <label for="cnp">CNP (Cod numeric personal):</label>
         <InputText id="cnp" @bind-Value="signupModel.Cnp" class="form-control"/>
     </div>
 
     <button type="submit" class="btn btn-primary">Sign Up</button>
+    <p>Already have an account? <NavLink href="/login">Log in</NavLink></p>
 </EditForm>
+}
 
 @code {
     [SupplyParameterFromForm]
-    private SignupModel signupModel { get; set; } = new ();
+    private SignupModel signupModel { get; set; } = new();
+
+    private string errorMessage = string.Empty;
+    private bool isSignupSuccessful = false;
 
     private async Task HandleValidSubmit()
     {
         try
         {
+            errorMessage = string.Empty;
+
             var response = await HttpClient.PostAsJsonAsync("/api/Signup", signupModel);
-            // response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
-            Console.WriteLine("Response status: " + response.StatusCode);
-            Console.WriteLine("Response body: " + responseBody);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                errorMessage = $"Error: {responseBody}";
+            }
+            else
+            {
+                // Signup was successful
+                isSignupSuccessful = true;
+            }
         }
         catch (HttpRequestException e)
         {
-            Console.WriteLine($"Error: {e.Message}");
+            errorMessage = $"Error: {e.Message}";
         }
+        StateHasChanged();
     }
 }

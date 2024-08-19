@@ -1,12 +1,17 @@
+using System.Text;
 using FluentValidation;
 using LiveVoting.Server.Data;
 using LiveVoting.Server.Repositories.User;
 using LiveVoting.Server.Services.Email;
 using LiveVoting.Server.Services.Hashing;
+using LiveVoting.Server.Services.Jwt;
 using LiveVoting.Server.Services.User;
 using LiveVoting.Server.Validators;
 using LiveVoting.Shared.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using IEmailSender = Microsoft.AspNetCore.Identity.UI.Services.IEmailSender;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,15 +21,74 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo() { Title = "MyAPI", Version = "v1" });
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "LiveVoting.Server", // Replace with your issuer
+            ValidAudience = "LiveVoting.Server", // Replace with your audience
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecret"])) // Replace with your secret
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("VerifiedUsersOnly", policy =>
+        policy.RequireClaim("IsEmailConfirmed", "True"));
+
+    options.AddPolicy("AuthenticatedUsers", policy =>
+        policy.RequireAuthenticatedUser());
+});
+
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+var clientAddress = builder.Configuration["Client"] ?? throw new ApplicationException("Client is missing from configuration");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient",
         builder =>
-            builder.WithOrigins("http://localhost:5235")
+            builder.WithOrigins(clientAddress)
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 });

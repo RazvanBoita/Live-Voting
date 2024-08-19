@@ -35,6 +35,13 @@ public class SignupController : ControllerBase
             return BadRequest("Email already exists"); 
         }
 
+        if (_userService.CnpExists(signupModel.Cnp))
+        {
+            return BadRequest("Cnp already assigned to another account");
+        }
+        
+        await _userService.InsertUser(signupModel);
+        
         await _emailSender.SendAccountConfirmationEmail(signupModel.Email);
         
         return Ok("Email sent to: " + signupModel.Email);

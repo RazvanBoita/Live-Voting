@@ -19,7 +19,7 @@ public class UserService : IUserService
         return _userRepository.UserExistsByEmail(emailAddress);
     }
 
-    public bool InsertUser(SignupModel signupModel)
+    public async Task InsertUser(SignupModel signupModel)
     {
         var newUser = new Models.User()
         {
@@ -31,6 +31,27 @@ public class UserService : IUserService
             UserId = Guid.NewGuid(),
             PasswordHash = _hashingService.Hash(signupModel.Password)
         };
-        return _userRepository.InsertUser(newUser);
+        _userRepository.InsertUser(newUser);
+    }
+
+    public Models.User? GetUserByEmail(string email)
+    {
+        return _userRepository.GetUserByEmail(email);
+    }
+
+    public bool ConfirmUserEmail(Models.User user)
+    {
+        return _userRepository.ConfirmEmailForUser(user);
+    }
+
+    public bool CnpExists(string cnp)
+    {
+        return _userRepository.GetUserByCnp(cnp) != null;
+    }
+
+    public bool VerifyCredentials(LoginModel loginModel)
+    {
+        var foundUser = _userRepository.GetUserByEmail(loginModel.Email);
+        return _hashingService.Verify(loginModel.Password, foundUser!.PasswordHash);
     }
 }
