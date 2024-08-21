@@ -1,0 +1,25 @@
+@page "/protected"
+@inject HttpClient HttpClient
+@* @rendermode @(new InteractiveServerRenderMode(prerender: false)) *@
+
+
+<EditForm Model = "@HttpClient" OnValidSubmit="CallProtectedEndpoint" FormName="protected-form">
+    <button type="submit" class="btn btn-primary">Check cookie</button>
+</EditForm>
+@code {
+    private async Task CallProtectedEndpoint()
+    {
+        Console.WriteLine("Am intrat in asta");
+        var response = await HttpClient.GetAsync("http://localhost:5005/api/protected");
+        
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(result);
+        }
+        else
+        {
+            Console.WriteLine("Request failed");
+        }
+    }
+}

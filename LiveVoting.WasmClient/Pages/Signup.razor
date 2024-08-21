@@ -70,7 +70,7 @@ else
         {
             errorMessage = string.Empty;
 
-            var response = await HttpClient.PostAsJsonAsync("/api/Signup", signupModel);
+            var response = await HttpClient.PostAsJsonAsync("/api/signup", signupModel);
             var responseBody = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)

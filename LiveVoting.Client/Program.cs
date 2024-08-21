@@ -1,4 +1,6 @@
+using Blazored.LocalStorage;
 using LiveVoting.Client.Components;
+using LiveVoting.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +8,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["Server"]) ?? throw new UriFormatException() });
+builder.Services.AddScoped<AuthorizationMessageHandler>();
+
+// builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["Server"]) ?? throw new UriFormatException() });
+
+builder.Services.AddHttpClient("MyApi", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Server"]) ?? throw new UriFormatException();
+}).AddHttpMessageHandler<AuthorizationMessageHandler>();
+
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("MyApi"));
+
+
+builder.Services.AddBlazoredLocalStorage();
+
 
 var app = builder.Build();
 
@@ -25,5 +40,6 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
 
 app.Run();

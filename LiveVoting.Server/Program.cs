@@ -1,3 +1,4 @@
+using System.Diagnostics.Eventing.Reader;
 using System.Text;
 using FluentValidation;
 using LiveVoting.Server.Data;
@@ -10,14 +11,26 @@ using LiveVoting.Server.Validators;
 using LiveVoting.Shared.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using IEmailSender = Microsoft.AspNetCore.Identity.UI.Services.IEmailSender;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+var clientAddress = builder.Configuration["Client"] ?? throw new ApplicationException("Client is missing from configuration");
+Console.WriteLine("Client address in server is: " + clientAddress);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowEverybody",
+        builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -83,15 +96,9 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 
-var clientAddress = builder.Configuration["Client"] ?? throw new ApplicationException("Client is missing from configuration");
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowBlazorClient",
-        builder =>
-            builder.WithOrigins(clientAddress)
-                .AllowAnyMethod()
-                .AllowAnyHeader());
-});
+
+
+
 
 var connectionString = builder.Configuration.GetConnectionString("LocalDb");
 
@@ -124,6 +131,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowEverybody");
+
+app.UseAuthorization();
+
 app.MapControllers();
 
 

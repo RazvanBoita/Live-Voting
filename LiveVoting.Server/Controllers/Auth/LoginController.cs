@@ -37,6 +37,7 @@ public class LoginController : ControllerBase
         
         
         var generatedJwt = _jwtService.GenerateTokenForLogin(foundUser);
+
         return Ok(generatedJwt);
     }
 }

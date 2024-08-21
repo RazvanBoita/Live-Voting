@@ -4,13 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace LiveVoting.Server.Controllers.TestProtected;
 
 [ApiController]
-[Route("/protected")]
+[Route("api/protected")]
 public class ProtectedEndpointsController : Controller
 {
     [Authorize(Policy = "VerifiedUsersOnly")]
     [HttpGet]
     public IActionResult Get()
     {
+        var authorizationHeader = Request.Headers["Authorization"].FirstOrDefault();
+        Console.WriteLine("Auth header:" + authorizationHeader);
         return Ok("Salut e autorizata treaba aici doar pt aia verificati");
     }
 
@@ -18,6 +20,8 @@ public class ProtectedEndpointsController : Controller
     [HttpGet("salut")]
     public IActionResult GetAgain()
     {
+        var authorizationHeader = Request.Headers["Authorization"].FirstOrDefault();
+        Console.WriteLine("Auth header:" + authorizationHeader);
         return Ok("Salut e autorizata treaba aici da nu prea doar pt aia care au cont practic");
     }
 }
