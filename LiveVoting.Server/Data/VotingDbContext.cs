@@ -10,4 +10,17 @@ public class VotingDbContext : DbContext
     }
     
     public DbSet<User> Users { get; set; }
+    public DbSet<LoggedUser> LoggedUsers { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.LoggedUser)
+            .WithOne(lu => lu.User)
+            .HasForeignKey<LoggedUser>(u => u.LoggedUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+    }
 }

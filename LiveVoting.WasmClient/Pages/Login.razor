@@ -74,7 +74,6 @@
     {
         await LocalStorage.SetItemAsync("jwt", jwt);
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _jwt);
-        //TODO vezi cum dq salvezi asta de tot in bearer ca sa mearga toate
         NavigationManager.NavigateTo("/");
     }
 }

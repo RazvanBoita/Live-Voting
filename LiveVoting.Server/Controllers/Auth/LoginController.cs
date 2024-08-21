@@ -25,19 +25,27 @@ public class LoginController : ControllerBase
     public IActionResult Login([FromBody] LoginModel loginModel)
     {
         var foundUser = _userService.GetUserByEmail(loginModel.Email);
+        
         if (foundUser is null)
         {
             return BadRequest("Login failed. Check your credentials and try again(email).");
         }
 
+        if (_userService.IsUserLoggedIn(foundUser.UserId))
+        {
+            return BadRequest("Login failed. User already logged in current session.");
+        }
+        
         if (!_userService.VerifyCredentials(loginModel))
         {
-            return BadRequest("Login failed. Check your credentials and try again(creds).");
+            return BadRequest("Login failed. Check your credentials and try again.");
         }
         
         
         var generatedJwt = _jwtService.GenerateTokenForLogin(foundUser);
-
+        _userService.LoginUser(foundUser.UserId);
+        
         return Ok(generatedJwt);
     }
+    
 }

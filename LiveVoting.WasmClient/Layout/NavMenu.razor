@@ -1,6 +1,14 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject AuthStateProvider AuthStateProvider
+@using System.IdentityModel.Tokens.Jwt
+@using LiveVoting.WasmClient.Services
+@using LiveVoting.WasmClient.StateManagement
+@implements IDisposable
+@inject HttpClient HttpClient
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">LiveVoting.WasmClient</a>
+        <a class="navbar-brand" href="">LiveVoting</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -15,15 +23,37 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="protected">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Protected
+            </NavLink>
+        </div>
+
+        @if (AuthStateProvider.IsAuthenticated)
+        {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="account">
+                <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Account
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            <button class="nav-link btn btn-link" @onclick="Logout">
+                <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Logout
+            </button>
+        </div>
+        }
+        else
+        {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="login">
+                <span class="bi bi-box-arrow-in-right-nav-menu" aria-hidden="true"></span> Login
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="signup">
+                <span class="bi bi-pencil-square-nav-menu" aria-hidden="true"></span> Signup
+            </NavLink>
+        </div>
+        }
     </nav>
 </div>
 
@@ -32,9 +62,39 @@
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthStateProvider.CheckAuthStateAsync();
+        AuthStateProvider.OnAuthStateChanged += StateHasChanged;
+    }
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
 
+    private async Task Logout()
+    {
+        var token = await LocalStorage.GetItemAsync<string>("jwt");
+        var guidClaim = JwtService.GetGuidClaimFromToken(token);
+        var uri = $"/api/logout/{guidClaim}";
+        Console.WriteLine("Guid " + guidClaim);
+        var response = await HttpClient.PostAsJsonAsync(uri, "");
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Logout failed");
+        }
+        else
+        {
+            // Handle successful login
+            Console.WriteLine("Logout successful!");
+        }
+        await AuthStateProvider.LogoutAsync();
+    }
+
+    public void Dispose()
+    {
+        AuthStateProvider.OnAuthStateChanged -= StateHasChanged;
+    }
 }

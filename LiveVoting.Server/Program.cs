@@ -109,10 +109,15 @@ builder.Services.AddDbContext<VotingDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+//TODO Add Validators
 builder.Services.AddScoped<IValidator<SignupModel>, SignupValidator>();
 
 
+//TODO Add Repos
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ILoggedUserRepository, LoggedUserRepository>();
+
+//TODO Add Others
 builder.Services.AddScoped<IConfirmationEmailSender, ConfirmationEmailSender>();
 
 

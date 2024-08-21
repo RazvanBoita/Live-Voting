@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using LiveVoting.WasmClient;
 using LiveVoting.WasmClient.Handlers;
+using LiveVoting.WasmClient.StateManagement;
 using Microsoft.AspNetCore.Components;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -13,6 +14,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 var serverAddress = builder.Configuration["Server"];
 
 builder.Services.AddBlazoredLocalStorage();
+
+builder.Services.AddScoped<AuthStateProvider>();
 
 builder.Services.AddTransient<AuthorizationMessageHandler>();
 
