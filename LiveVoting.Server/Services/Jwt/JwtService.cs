@@ -48,7 +48,7 @@ public class JwtService : IJwtService
             issuer: Issuer,
             audience: Audience,
             claims: claims,
-            expires: DateTime.Now.AddHours(6),
+            expires: DateTime.Now.AddHours(48),
             signingCredentials: credentials
         );
         

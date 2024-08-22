@@ -78,7 +78,8 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuerSigningKey = true,
             ValidIssuer = "LiveVoting.Server", // Replace with your issuer
             ValidAudience = "LiveVoting.Server", // Replace with your audience
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecret"])) // Replace with your secret
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecret"])), // Replace with your secret
+            ClockSkew = TimeSpan.Zero
         };
     });
 
@@ -139,6 +140,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowEverybody");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
