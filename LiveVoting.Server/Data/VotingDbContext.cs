@@ -22,5 +22,25 @@ public class VotingDbContext : DbContext
             .HasForeignKey<LoggedUser>(u => u.LoggedUserId)
             .OnDelete(DeleteBehavior.Cascade);
         
+        //Election to ElectionRound One-to-many
+        modelBuilder.Entity<Election>()
+            .HasMany(e => e.ElectionRounds)
+            .WithOne(er => er.Election)
+            .HasForeignKey(er => er.ElectionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        //ElectionRound to RoundCandidate One-to-many
+        modelBuilder.Entity<ElectionRound>()
+            .HasMany(er => er.Candidates)
+            .WithOne(cr => cr.ElectionRound)
+            .HasForeignKey(cr => cr.ElectionRoundId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        //RoundCandidate to Candidate Many-to-one
+        modelBuilder.Entity<RoundCandidate>()
+            .HasOne(rc => rc.Candidate)
+            .WithMany()
+            .HasForeignKey(rc => rc.CandidateId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

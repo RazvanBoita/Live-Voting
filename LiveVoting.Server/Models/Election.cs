@@ -7,4 +7,5 @@ public class Election
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public bool HasFinished { get; set; }
+    public ICollection<ElectionRound> ElectionRounds { get; set; } = new List<ElectionRound>();
 }

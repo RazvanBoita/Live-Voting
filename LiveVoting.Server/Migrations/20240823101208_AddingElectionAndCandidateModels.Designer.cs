@@ -4,6 +4,7 @@ using LiveVoting.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LiveVoting.Server.Migrations
 {
     [DbContext(typeof(VotingDbContext))]
-    partial class VotingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240823101208_AddingElectionAndCandidateModels")]
+    partial class AddingElectionAndCandidateModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,8 +139,8 @@ namespace LiveVoting.Server.Migrations
                     b.Property<int>("ElectionRoundId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Percentage")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("FinalCandidateId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Votes")
                         .HasColumnType("int");
