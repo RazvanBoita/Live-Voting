@@ -4,6 +4,7 @@ using LiveVoting.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LiveVoting.Server.Migrations
 {
     [DbContext(typeof(VotingDbContext))]
-    partial class VotingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240826132132_AddingImageUrlToCandidate")]
+    partial class AddingImageUrlToCandidate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,7 +51,7 @@ namespace LiveVoting.Server.Migrations
 
                     b.HasKey("CandidateId");
 
-                    b.ToTable("Candidates");
+                    b.ToTable("Candidate");
                 });
 
             modelBuilder.Entity("LiveVoting.Server.Models.Election", b =>
@@ -74,7 +77,7 @@ namespace LiveVoting.Server.Migrations
 
                     b.HasKey("ElectionId");
 
-                    b.ToTable("Elections");
+                    b.ToTable("Election");
                 });
 
             modelBuilder.Entity("LiveVoting.Server.Models.ElectionRound", b =>
@@ -104,7 +107,7 @@ namespace LiveVoting.Server.Migrations
 
                     b.HasIndex("ElectionId");
 
-                    b.ToTable("ElectionRounds");
+                    b.ToTable("ElectionRound");
                 });
 
             modelBuilder.Entity("LiveVoting.Server.Models.LoggedUser", b =>
@@ -152,7 +155,7 @@ namespace LiveVoting.Server.Migrations
 
                     b.HasIndex("ElectionRoundId");
 
-                    b.ToTable("RoundCandidates");
+                    b.ToTable("RoundCandidate");
                 });
 
             modelBuilder.Entity("LiveVoting.Server.Models.User", b =>

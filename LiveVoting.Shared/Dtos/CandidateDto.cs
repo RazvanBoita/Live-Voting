@@ -1,8 +1,7 @@
-namespace LiveVoting.Server.Models;
+namespace LiveVoting.Shared.Dtos;
 
-public class Candidate
+public class CandidateDto
 {
-    public int CandidateId { get; set; }
     public string Name { get; set; }
     public string Party { get; set; }
     public string Bio { get; set; }

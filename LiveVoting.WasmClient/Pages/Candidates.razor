@@ -1,0 +1,42 @@
+@page "/candidates"
+@using LiveVoting.Shared.Dtos
+@using LiveVoting.WasmClient.Components
+@inject HttpClient HttpClient
+
+<h1>Candidates</h1>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    @foreach (var candidate in CandidateDtos)
+    {
+        <div class="col">
+            <Candidate CandidateDto="candidate" />
+        </div>
+    }
+</div>
+
+@code {
+    private List<CandidateDto> CandidateDtos { get; set; } = new List<CandidateDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // TODO: Load candidates from your data source
+        CandidateDtos = await GetCandidates();
+    }
+
+    private async Task<List<CandidateDto>>? GetCandidates()
+    {
+        var response = await HttpClient.GetAsync("api/candidates");
+        if (response.IsSuccessStatusCode)
+        {
+            CandidateDtos = await response.Content.ReadFromJsonAsync<List<CandidateDto>>();
+        }
+        else
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+        }
+
+        return CandidateDtos!;
+    }
+
+    
+}

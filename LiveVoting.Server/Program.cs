@@ -1,8 +1,14 @@
 using System.Diagnostics.Eventing.Reader;
 using System.Text;
+using Amazon;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Runtime;
+using Amazon.S3;
 using FluentValidation;
 using LiveVoting.Server.Data;
+using LiveVoting.Server.Repositories.Candidate;
 using LiveVoting.Server.Repositories.User;
+using LiveVoting.Server.Services.Candidate;
 using LiveVoting.Server.Services.Email;
 using LiveVoting.Server.Services.Hashing;
 using LiveVoting.Server.Services.Jwt;
@@ -63,6 +69,15 @@ builder.Services.AddSwaggerGen(opt =>
     });
 });
 
+
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>(new AWSOptions
+{
+    Credentials = new BasicAWSCredentials(builder.Configuration["s3Id"], builder.Configuration["s3key"]),
+    Region = RegionEndpoint.EUNorth1
+});
+
+
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -117,10 +132,11 @@ builder.Services.AddScoped<IValidator<SignupModel>, SignupValidator>();
 //TODO Add Repos
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILoggedUserRepository, LoggedUserRepository>();
+builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
 
 //TODO Add Others
 builder.Services.AddScoped<IConfirmationEmailSender, ConfirmationEmailSender>();
-
+builder.Services.AddScoped<ICandidateService, CandidateService>();
 
 
 //TODO Register services

@@ -1,0 +1,68 @@
+@using LiveVoting.Shared.Dtos
+@inject HttpClient HttpClient
+
+
+<div class="card candidate-card mb-3">
+    @if (!string.IsNullOrEmpty(CandidateDto.ImageUrl))
+    {
+        //@{ async () => await LoadImage(CandidateDto.ImageUrl)
+        <img src="@imageSrc" class="card-img-top candidate-image" alt="@CandidateDto.Name">
+    }
+    <div class="card-body">
+        <h5 class="card-title">@CandidateDto.Name</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@CandidateDto.Party</h6>
+        <p class="card-text">@CandidateDto.Bio</p>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CandidateDto CandidateDto { get; set; }
+
+    private string imageSrc = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            imageSrc = await LoadImage(CandidateDto.ImageUrl);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+    
+    private async Task<string> LoadImage(string imageUrl)
+    {
+        var toReturn = new byte[]{};
+        try
+        {
+            var imageBytes = await HttpClient.GetByteArrayAsync($"api/s3/buckets/presidential-elections-images/{imageUrl}");
+            toReturn = imageBytes;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+
+        return $"data:image/jpeg;base64,{Convert.ToBase64String(toReturn)}";        
+    }
+}
+
+<style>
+    .candidate-card {
+        max-width: 18rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+
+    .candidate-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .candidate-image {
+        height: 200px;
+        object-fit: cover;
+    }
+</style>
