@@ -1,17 +1,21 @@
 @using LiveVoting.Shared.Dtos
 @inject HttpClient HttpClient
-
+@inject NavigationManager NavigationManager
 
 <div class="card candidate-card mb-3">
     @if (!string.IsNullOrEmpty(CandidateDto.ImageUrl))
     {
-        //@{ async () => await LoadImage(CandidateDto.ImageUrl)
-        <img src="@imageSrc" class="card-img-top candidate-image" alt="@CandidateDto.Name">
+        <div class="image-container">
+            <img src="@imageSrc" class="card-img-top candidate-image" alt="@CandidateDto.Name">
+        </div>
     }
     <div class="card-body">
         <h5 class="card-title">@CandidateDto.Name</h5>
         <h6 class="card-subtitle mb-2 text-muted">@CandidateDto.Party</h6>
-        <p class="card-text">@CandidateDto.Bio</p>
+        @if (!string.IsNullOrEmpty(CandidateDto.Bio))
+        {
+            <a href="@CandidateDto.Bio" target="_blank" class="btn btn-primary mt-2">Mai multe informatii</a>
+        }
     </div>
 </div>
 
@@ -19,7 +23,7 @@
     [Parameter]
     public CandidateDto CandidateDto { get; set; }
 
-    private string imageSrc = "";
+    private string imageSrc = "loading.gif";
 
     protected override async Task OnInitializedAsync()
     {
@@ -52,17 +56,57 @@
 
 <style>
     .candidate-card {
-        max-width: 18rem;
+        width: 300px;
+        height: 450px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        transition: transform 0.3s;
+        transition: transform 0.3s, box-shadow 0.3s;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        cursor: pointer;
     }
 
     .candidate-card:hover {
         transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .image-container {
+        height: 290px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .candidate-image {
-        height: 200px;
+        width: 100%;
+        height: 100%;
         object-fit: cover;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 160px;
+        overflow-y: auto;
+    }
+
+    .card-title {
+        color: #007bff;
+    }
+
+    .card-subtitle {
+        color: #6c757d;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-primary:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
     }
 </style>

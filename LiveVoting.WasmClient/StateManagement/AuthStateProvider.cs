@@ -31,7 +31,6 @@ public class AuthStateProvider
         var token = await _localStorage.GetItemAsync<string>("jwt");
         if (token == null)
         {
-            await _jsRuntime.InvokeVoidAsync("sessionExpiredAlert", "Session expired, log in!");
             IsAuthenticated = false;
             OnAuthStateChanged?.Invoke();
             return;
@@ -47,7 +46,6 @@ public class AuthStateProvider
             var uri = $"/api/logout/{guidClaim}";
             var response = await _httpClient.PostAsJsonAsync(uri, "");
             
-            await _jsRuntime.InvokeVoidAsync("sessionExpiredAlert", "Session expired, log in!", uri);
             
             IsAuthenticated = false;
             OnAuthStateChanged?.Invoke();

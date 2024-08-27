@@ -5,34 +5,47 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="row w-100">
+        <div class="col-lg-6 col-md-8 mx-auto">
 
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Login</h3>
 
-<h3>Login</h3>
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="alert alert-danger" role="alert">
-        @((MarkupString)errorMessage)
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                    <div class="alert alert-danger" role="alert">
+                        @((MarkupString)errorMessage)
+                    </div>
+                    }
+
+                    <EditForm Model="@loginModel" OnValidSubmit="HandleValidSubmit" FormName="login-form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <InputText id="email" @bind-Value="loginModel.Email" class="form-control" placeholder="Enter your email" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <InputText id="password" @bind-Value="loginModel.Password" class="form-control" type="password" placeholder="Enter your password" />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-block mt-3">Log In</button>
+                        </div>
+
+                        <p class="text-center mt-3">Don't have an account yet? <NavLink href="/signup" class="text-primary">Sign up</NavLink></p>
+                    </EditForm>
+                </div>
+            </div>
+
+        </div>
     </div>
-}
-
-<EditForm Model="@loginModel" OnValidSubmit="HandleValidSubmit" FormName="login-form">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <InputText id="email" @bind-Value="loginModel.Email" class="form-control" />
-    </div>
-    
-    <div class="form-group">
-        <label for="password">Password:</label>
-        <InputText id="password" @bind-Value="loginModel.Password" class="form-control" type="password" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Log In</button>
-    <p>Don't have an account yet? <NavLink href="/signup">Sign up</NavLink></p>
-    
-</EditForm>
+</div>
 
 @code {
     [SupplyParameterFromForm]
@@ -47,18 +60,15 @@
         try
         {
             errorMessage = string.Empty;
-
-            // Here you would typically send a request to your login API
             var response = await HttpClient.PostAsJsonAsync("/api/login", loginModel);
             var responseBody = await response.Content.ReadAsStringAsync();
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 errorMessage = $"Login failed: {responseBody}";
             }
             else
             {
-                // Handle successful login
                 Console.WriteLine("Login successful!");
                 Console.WriteLine("Recieved the following jwt: " + responseBody);
                 await StoreJwtAndNavigate(responseBody);
@@ -66,10 +76,9 @@
         }
         catch (HttpRequestException e)
         {
-            errorMessage = $"Error: {e.Message}";
+        errorMessage = $"Error: {e.Message}";
         }
     }
-    
     private async Task StoreJwtAndNavigate(string jwt)
     {
         await LocalStorage.SetItemAsync("jwt", jwt);

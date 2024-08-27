@@ -4,58 +4,72 @@
 @inject ILogger<Signup> Logger
 @inject NavigationManager NavigationManager
 
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="row w-100">
+        <div class="col-lg-6 col-md-8 mx-auto">
 
-<h3>Sign Up</h3>
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Sign Up</h3>
 
-@if (isSignupSuccessful)
-{
-    <div class="alert alert-success" role="alert">
-        <p>We sent you a confirmation email! Make sure to click the link provided to verify your account!</p>
-        <p>Confirmed your account? You can now <NavLink href="/login">log in</NavLink>.</p>
+                    @if (isSignupSuccessful)
+                    {
+                    <div class="alert alert-success" role="alert">
+                        <p>We sent you a confirmation email! Make sure to click the link provided to verify your account!</p>
+                        <p>Confirmed your account? You can now <NavLink href="/login" class="text-success">log in</NavLink>.</p>
+                    </div>
+                    }
+                    else
+                    {
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                    <div class="alert alert-danger" role="alert">
+                        @((MarkupString)errorMessage)
+                    </div>
+                    }
+
+                    <EditForm Model="@signupModel" OnValidSubmit="HandleValidSubmit" FormName="signup-form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <InputText id="email" @bind-Value="signupModel.Email" class="form-control" placeholder="Enter your email"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="firstname">First Name:</label>
+                            <InputText id="firstname" @bind-Value="signupModel.FirstName" class="form-control" placeholder="Enter your first name"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="surname">Surname:</label>
+                            <InputText id="surname" @bind-Value="signupModel.Surname" class="form-control" placeholder="Enter your surname"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <InputText id="password" @bind-Value="signupModel.Password" class="form-control" type="password" placeholder="Enter your password"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cnp">CNP (Cod numeric personal):</label>
+                            <InputText id="cnp" @bind-Value="signupModel.Cnp" class="form-control" placeholder="Enter your CNP"/>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-block mt-3">Sign Up</button>
+                        </div>
+
+                        <p class="text-center mt-3">Already have an account? <NavLink href="/login" class="text-primary">Log in</NavLink></p>
+                    </EditForm>
+                    }
+                </div>
+            </div>
+
+        </div>
     </div>
-}
-else
-{
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-<div class="alert alert-danger" role="alert">
-    @((MarkupString)errorMessage)
 </div>
-}
-
-<EditForm Model="@signupModel" OnValidSubmit="HandleValidSubmit" FormName="signup-form">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <InputText id="email" @bind-Value="signupModel.Email" class="form-control"/>
-    </div>
-
-    <div class="form-group">
-        <label for="firstname">First Name:</label>
-        <InputText id="firstname" @bind-Value="signupModel.FirstName" class="form-control"/>
-    </div>
-
-    <div class="form-group">
-        <label for="surname">Surname:</label>
-        <InputText id="surname" @bind-Value="signupModel.Surname" class="form-control"/>
-    </div>
-
-    <div class="form-group">
-        <label for="password">Password:</label>
-        <InputText id="password" @bind-Value="signupModel.Password" class="form-control" type="password"/>
-    </div>
-
-    <div class="form-group">
-        <label for="cnp">CNP (Cod numeric personal):</label>
-        <InputText id="cnp" @bind-Value="signupModel.Cnp" class="form-control"/>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Sign Up</button>
-    <p>Already have an account? <NavLink href="/login">Log in</NavLink></p>
-</EditForm>
-}
 
 @code {
     [SupplyParameterFromForm]
@@ -79,7 +93,6 @@ else
             }
             else
             {
-                // Signup was successful
                 isSignupSuccessful = true;
             }
         }

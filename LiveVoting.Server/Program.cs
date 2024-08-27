@@ -7,8 +7,11 @@ using Amazon.S3;
 using FluentValidation;
 using LiveVoting.Server.Data;
 using LiveVoting.Server.Repositories.Candidate;
+using LiveVoting.Server.Repositories.Election;
+using LiveVoting.Server.Repositories.ElectionRound;
 using LiveVoting.Server.Repositories.User;
 using LiveVoting.Server.Services.Candidate;
+using LiveVoting.Server.Services.Election;
 using LiveVoting.Server.Services.Email;
 using LiveVoting.Server.Services.Hashing;
 using LiveVoting.Server.Services.Jwt;
@@ -133,6 +136,9 @@ builder.Services.AddScoped<IValidator<SignupModel>, SignupValidator>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILoggedUserRepository, LoggedUserRepository>();
 builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
+builder.Services.AddScoped<IElectionRepository, ElectionRepository>();
+builder.Services.AddScoped<IElectionRoundRepository, ElectionRoundRepository>();
+
 
 //TODO Add Others
 builder.Services.AddScoped<IConfirmationEmailSender, ConfirmationEmailSender>();
@@ -142,6 +148,7 @@ builder.Services.AddScoped<ICandidateService, CandidateService>();
 //TODO Register services
 builder.Services.AddScoped<IHashingService, HashingService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IElectionService, ElectionService>();
 
 var app = builder.Build();
 

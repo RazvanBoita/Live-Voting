@@ -1,7 +1,147 @@
 ﻿@page "/"
+@inject NavigationManager NavigationManager
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Alegeri Prezidențiale România 2024</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container mt-5">
+    <div class="jumbotron text-center bg-light border rounded-3 p-5 shadow-sm">
+        <h1 class="display-4 text-primary">Alegeri Prezidențiale România 2024</h1>
+        <p class="lead">Bine ați venit pe platforma oficială de informare și vot pentru alegerile prezidențiale!</p>
+        <hr class="my-4">
+        <p>Exercitați-vă dreptul democratic și contribuiți la viitorul României.</p>
+        <button class="btn btn-primary btn-lg" @onclick="NavigateToVote">Votează acum</button>
+    </div>
 
-Welcome to your new app.
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-info"><i class="fas fa-info-circle"></i> Informații</h5>
+                    <p class="card-text">Aflați detalii despre candidați, programe electorale și procesul de vot.</p>
+                    <button class="btn btn-outline-info" @onclick="NavigateToInfo">Mai multe</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-success"><i class="fas fa-chart-bar"></i> Rezultate Live</h5>
+                    <p class="card-text">Urmăriți în timp real evoluția voturilor și tendințele electorale.</p>
+                    <button class="btn btn-outline-success" @onclick="NavigateToResults">Vezi rezultate</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-warning"><i class="fas fa-question-circle"></i> Întrebări Frecvente</h5>
+                    <p class="card-text">Găsiți răspunsuri la cele mai comune întrebări despre procesul electoral.</p>
+                    <button class="btn btn-outline-warning" @onclick="NavigateToFAQ">Citește FAQ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 p-4 bg-light border rounded-3 shadow-sm">
+        <h2 class="text-center mb-4">Cronologie Electorală</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-badge bg-primary"></div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Începerea Campaniei</h4>
+                        <p><small class="text-muted"><i class="fas fa-clock"></i> 1 Septembrie 2024</small></p>
+                    </div>
+                    <div class="timeline-body">
+                        <p>Demararea oficială a campaniei electorale pentru alegerile prezidențiale.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-badge bg-success"></div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Ziua Votului</h4>
+                        <p><small class="text-muted"><i class="fas fa-clock"></i> 10 Noiembrie 2024</small></p>
+                    </div>
+                    <div class="timeline-body">
+                        <p>Cetățenii își exercită dreptul la vot în cadrul primului tur al alegerilor.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-badge bg-info"></div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Al Doilea Tur (dacă este necesar)</h4>
+                        <p><small class="text-muted"><i class="fas fa-clock"></i> 24 Noiembrie 2024</small></p>
+                    </div>
+                    <div class="timeline-body">
+                        <p>În cazul în care niciun candidat nu obține majoritatea absolută, se organizează turul doi.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void NavigateToVote() => NavigationManager.NavigateTo("/vot");
+    private void NavigateToInfo() => NavigationManager.NavigateTo("/informatii");
+    private void NavigateToResults() => NavigationManager.NavigateTo("/rezultate");
+    private void NavigateToFAQ() => NavigationManager.NavigateTo("/faq");
+}
+
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+
+    .timeline-item {
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .timeline-badge {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        position: absolute;
+        left: 50%;
+        top: 10px;
+        margin-left: -8px;
+    }
+
+    .timeline-panel {
+        width: 46%;
+        float: left;
+        border: 1px solid #d4d4d4;
+        border-radius: 4px;
+        padding: 20px;
+        position: relative;
+        background-color: #fff;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .timeline-item:nth-child(even) .timeline-panel {
+        float: right;
+    }
+
+    .timeline-item:nth-child(even) .timeline-panel::before {
+        border-left-width: 0;
+        border-right-width: 15px;
+        left: -15px;
+        right: auto;
+    }
+</style>

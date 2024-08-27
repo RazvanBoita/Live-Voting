@@ -8,7 +8,7 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">LiveVoting</a>
+        <a class="navbar-brand" href="">Alegeri Prezidentiale</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -17,14 +17,16 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
+        <div class="nav-item px-3 text-success">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                @* <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> *@
+                Acasa
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="protected">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Protected
+            <NavLink class="nav-link d-flex align-items-center" href="istorie">
+                @* <span class="bi bi-clock-history me-2" aria-hidden="true"></span> *@
+                Istoria alegerilor
             </NavLink>
         </div>
 
@@ -32,12 +34,14 @@
         {
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="account">
-                <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Account
+                @* <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span>  *@
+                Account
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <button class="nav-link btn btn-link" @onclick="Logout">
-                <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Logout
+                @* <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span>  *@
+                Logout
             </button>
         </div>
         }
@@ -45,14 +49,16 @@
         {
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="login">
-                <span class="bi bi-box-arrow-in-right-nav-menu" aria-hidden="true"></span> Login
+                @* <span class="bi bi-box-arrow-in-right-nav-menu" aria-hidden="true"></span> *@
+                Login / Signup
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="signup">
-                <span class="bi bi-pencil-square-nav-menu" aria-hidden="true"></span> Signup
-            </NavLink>
-        </div>
+        @* <div class="nav-item px-3"> *@
+        @*     <NavLink class="nav-link" href="signup"> *@
+        @*         $1$ <span class="bi bi-pencil-square-nav-menu" aria-hidden="true"></span>  #1# *@
+        @*         Signup *@
+        @*     </NavLink> *@
+        @* </div> *@
         }
     </nav>
 </div>
@@ -98,3 +104,15 @@
         AuthStateProvider.OnAuthStateChanged -= StateHasChanged;
     }
 }
+<style>
+    .nav-link {
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-link .bi {
+        font-size: 1.2em; /* Adjust icon size as needed */
+        margin-right: 8px; /* Spacing between icon and text */
+    }
+
+</style>
