@@ -1,0 +1,193 @@
+@using LiveVoting.Shared.Dtos
+@inject HttpClient HttpClient
+
+@code {
+    [Parameter] public int Year { get; set; }
+
+    private List<RoundCandidateDto> round1Candidates = new();
+    private List<RoundCandidateDto> round2Candidates = new();
+    private bool showRound1 = true;
+    private bool isLoading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+        var round1Url = $"/api/rezultate/{Year}/1";
+        var round2Url = $"/api/rezultate/{Year}/2";
+
+        round1Candidates = await HttpClient.GetFromJsonAsync<List<RoundCandidateDto>>(round1Url);
+        round2Candidates = await HttpClient.GetFromJsonAsync<List<RoundCandidateDto>>(round2Url);
+
+        await LoadImages(round1Candidates);
+        await LoadImages(round2Candidates);
+
+        isLoading = false;
+    }
+
+    private void ToggleRound(int round)
+    {
+        showRound1 = (round == 1);
+    }
+
+    private async Task LoadImages(List<RoundCandidateDto> candidates)
+    {
+        foreach (var candidate in candidates)
+        {
+            try
+            {
+                candidate.ImageUrl = await LoadImage(candidate.ImageUrl);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                candidate.ImageUrl = "path/to/placeholder-image.jpg"; // Adăugați o imagine placeholder
+            }
+        }
+    }
+
+    private async Task<string> LoadImage(string imageUrl)
+    {
+        try
+        {
+            var imageBytes = await HttpClient.GetByteArrayAsync($"api/s3/buckets/presidential-elections-images/{imageUrl}");
+            return $"data:image/jpeg;base64,{Convert.ToBase64String(imageBytes)}";
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return "path/to/placeholder-image.jpg"; // Returnați o imagine placeholder în caz de eroare
+        }
+    }
+
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2>Rezultate la alegerile prezidențiale - @Year</h2>
+        <div class="btn-group">
+            <button class="btn @(showRound1 ? "btn-primary" : "btn-outline-primary")" @onclick="() => ToggleRound(1)">Turul 1</button>
+            <button class="btn @(!showRound1 ? "btn-primary" : "btn-outline-primary")" @onclick="() => ToggleRound(2)">Turul 2</button>
+        </div>
+    </div>
+</div>
+
+@if (isLoading)
+{
+    <div class="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Se încarcă...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var candidate in (showRound1 ? round1Candidates : round2Candidates))
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card candidate-card">
+                    <div class="image-container">
+                        <img src="@candidate.ImageUrl" class="card-img-top candidate-image" alt="Imagine @candidate.Name">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">@candidate.Name</h5>
+                        <p class="card-text">
+                            <strong>Partid:</strong> @candidate.Party
+                        </p>
+                        <a href="@candidate.Bio" target="_blank" class="btn btn-primary m-0 p-0">Mai multe informatii</a>
+                        <p class="card-text">
+                            <strong>Voturi:</strong> @candidate.Votes
+                        </p>
+                        <p class="card-text"><strong>Procentaj:</strong> @candidate.Percentage%</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .candidate-card {
+        width: 300px;
+        height: 450px;
+        margin: 0 auto;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+    }
+
+    .candidate-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .image-container {
+        height: 250px;
+        overflow: hidden;
+    }
+
+    .candidate-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-body {
+        height: 200px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .card-title {
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+
+    .card-text {
+        margin-bottom: 5px;
+    }
+
+    .bio {
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .btn-group .btn {
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover, .btn-outline-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    .btn-outline-primary {
+        color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-outline-primary:hover {
+        color: #fff;
+    }
+</style>

@@ -1,0 +1,36 @@
+@page "/rezultate"
+@using LiveVoting.WasmClient.StateManagement
+@inject AuthStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+@code {
+    private bool isCheckingAuthState = true;
+    private bool isAuthenticated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthStateProvider.CheckAuthStateAsync();
+        isAuthenticated = AuthStateProvider.IsAuthenticated;
+        isCheckingAuthState = false;
+
+        if (!isAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+}
+
+@if (isCheckingAuthState)
+{
+    <div class="text-center mt-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-secondary mt-3">Verificăm autentificarea...</p>
+    </div>
+}
+else if (isAuthenticated)
+{
+    <h3>Rezultate24</h3>
+    <p>Bine ați venit la pagina de rezultate pentru alegerile din 2024.</p>
+}

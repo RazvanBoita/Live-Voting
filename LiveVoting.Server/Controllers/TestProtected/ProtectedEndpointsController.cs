@@ -13,7 +13,7 @@ public class ProtectedEndpointsController : Controller
     {
         var authorizationHeader = Request.Headers["Authorization"].FirstOrDefault();
         Console.WriteLine("Auth header:" + authorizationHeader);
-        return Ok("Salut e autorizata treaba aici doar pt aia verificati");
+        return Ok("Email is verified");
     }
 
     [Authorize(Policy = "AuthenticatedUsers")]
@@ -22,6 +22,6 @@ public class ProtectedEndpointsController : Controller
     {
         var authorizationHeader = Request.Headers["Authorization"].FirstOrDefault();
         Console.WriteLine("Auth header:" + authorizationHeader);
-        return Ok("Salut e autorizata treaba aici da nu prea doar pt aia care au cont practic");
+        return Ok("User is authenticated");
     }
 }

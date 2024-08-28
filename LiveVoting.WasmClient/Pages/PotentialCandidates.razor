@@ -1,0 +1,45 @@
+@page "/candidati-2024"
+@using LiveVoting.Shared.Dtos
+@inject HttpClient Http
+
+@code {
+    private List<CandidateDto> candidates;
+
+    protected override async Task OnInitializedAsync()
+    {
+        candidates = await Http.GetFromJsonAsync<List<CandidateDto>>("api/alegeri-2024/candidati");
+    }
+}
+
+<div class="container mt-5">
+    <h1 class="text-center text-primary">Lista Potențialilor Candidați pentru Alegerile Prezidențiale 2024</h1>
+    <p class="text-center text-secondary">Această pagină servește ca o listă de potențiali candidați pentru următoarele alegeri prezidențiale. Fiecare candidat afișat mai jos reprezintă o opțiune posibilă pentru funcția de Președinte al României în anul 2024.</p>
+    
+    @if (candidates == null)
+    {
+        <div class="text-center text-warning">
+            <p>Încărcăm lista candidaților...</p>
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (candidates.Count == 0)
+    {
+        <div class="alert alert-info text-center" role="alert">
+            <strong>Nu s-au găsit candidați!</strong>
+            <p>În acest moment nu există informații despre candidații potențiali.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var candidate in candidates)
+            {
+                <div class="col-md-4">
+                    <CandidateComponent CandidateDto="candidate" />
+                </div>
+            }
+        </div>
+    }
+</div>

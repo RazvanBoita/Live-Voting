@@ -1,14 +1,14 @@
 ﻿@page "/"
 @inject NavigationManager NavigationManager
 
-<PageTitle>Alegeri Prezidențiale România 2024</PageTitle>
+<PageTitle>Alegeri Prezidențiale România 2024 - Intenții de Vot</PageTitle>
 
 <div class="container mt-5">
     <div class="jumbotron text-center bg-light border rounded-3 p-5 shadow-sm">
-        <h1 class="display-4 text-primary">Alegeri Prezidențiale România 2024</h1>
-        <p class="lead">Bine ați venit pe platforma oficială de informare și vot pentru alegerile prezidențiale!</p>
+        <h1 class="display-4 text-primary">Alegeri Prezidențiale România 2024 - Intenții de Vot</h1>
+        <p class="lead">Bine ați venit pe platforma unde puteți împărtăși cu cine intenționați să votați!</p>
         <hr class="my-4">
-        <p>Exercitați-vă dreptul democratic și contribuiți la viitorul României.</p>
+        <p>Ajutați-ne să conturăm o imagine a preferințelor electoratului înainte de ziua alegerilor.</p>
         <button class="btn btn-primary btn-lg" @onclick="NavigateToVote">Votează acum</button>
     </div>
 
@@ -18,7 +18,9 @@
                 <div class="card-body">
                     <h5 class="card-title text-info"><i class="fas fa-info-circle"></i> Informații</h5>
                     <p class="card-text">Aflați detalii despre candidați, programe electorale și procesul de vot.</p>
-                    <button class="btn btn-outline-info" @onclick="NavigateToInfo">Mai multe</button>
+                    <button class="btn btn-outline-info">
+                        <a href="https://www.roaep.ro/legislatie/alegeri-prezidentiale/" target="_blank">Mai multe</a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -26,7 +28,7 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <h5 class="card-title text-success"><i class="fas fa-chart-bar"></i> Rezultate Live</h5>
-                    <p class="card-text">Urmăriți în timp real evoluția voturilor și tendințele electorale.</p>
+                    <p class="card-text">Urmăriți în timp real preferințele alegătorilor și evoluția intențiilor de vot.</p>
                     <button class="btn btn-outline-success" @onclick="NavigateToResults">Vezi rezultate</button>
                 </div>
             </div>
@@ -36,7 +38,9 @@
                 <div class="card-body">
                     <h5 class="card-title text-warning"><i class="fas fa-question-circle"></i> Întrebări Frecvente</h5>
                     <p class="card-text">Găsiți răspunsuri la cele mai comune întrebări despre procesul electoral.</p>
-                    <button class="btn btn-outline-warning" @onclick="NavigateToFAQ">Citește FAQ</button>
+                    <button class="btn btn-outline-warning">
+                        <a href="https://votcorect.ro/prezidentiale-2019/faq/" target="_blank" class="text-decoration-none">Citește FAQ</a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -86,62 +90,8 @@
 </div>
 
 @code {
-    private void NavigateToVote() => NavigationManager.NavigateTo("/vot");
-    private void NavigateToInfo() => NavigationManager.NavigateTo("/informatii");
-    private void NavigateToResults() => NavigationManager.NavigateTo("/rezultate");
-    private void NavigateToFAQ() => NavigationManager.NavigateTo("/faq");
+private void NavigateToVote() => NavigationManager.NavigateTo("/vot");
+private void NavigateToInfo() => NavigationManager.NavigateTo("/informatii");
+private void NavigateToResults() => NavigationManager.NavigateTo("/rezultate");
+private void NavigateToFAQ() => NavigationManager.NavigateTo("https://votcorect.ro/prezidentiale-2019/faq/");
 }
-
-<style>
-    .timeline {
-        position: relative;
-        padding: 20px 0;
-    }
-
-    .timeline::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 50%;
-        width: 2px;
-        background-color: #e9ecef;
-    }
-
-    .timeline-item {
-        margin-bottom: 30px;
-        position: relative;
-    }
-
-    .timeline-badge {
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        position: absolute;
-        left: 50%;
-        top: 10px;
-        margin-left: -8px;
-    }
-
-    .timeline-panel {
-        width: 46%;
-        float: left;
-        border: 1px solid #d4d4d4;
-        border-radius: 4px;
-        padding: 20px;
-        position: relative;
-        background-color: #fff;
-        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .timeline-item:nth-child(even) .timeline-panel {
-        float: right;
-    }
-
-    .timeline-item:nth-child(even) .timeline-panel::before {
-        border-left-width: 0;
-        border-right-width: 15px;
-        left: -15px;
-        right: auto;
-    }
-</style>

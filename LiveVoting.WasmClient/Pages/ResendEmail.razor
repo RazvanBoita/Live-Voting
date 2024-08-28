@@ -1,0 +1,74 @@
+@page "/resend-email-verification"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+@code {
+    private bool isResending = false;
+    private bool resendSuccess = false;
+    private bool resendError = false;
+
+    private async Task ResendVerificationEmail()
+    {
+        isResending = true;
+        resendSuccess = false;
+        resendError = false;
+
+        try
+        {
+            var response = await Http.GetAsync("/api/resend");
+
+            if (response.IsSuccessStatusCode)
+            {
+                resendSuccess = true;
+            }
+            else
+            {
+                resendError = true;
+            }
+        }
+        catch (Exception)
+        {
+            resendError = true;
+        }
+        finally
+        {
+            isResending = false;
+        }
+    }
+}
+
+<div class="text-center mt-5">
+    <h1 class="text-danger">Email Neconfirmat</h1>
+    <p class="text-muted">Sunteți aici deoarece emailul dumneavoastră nu este verificat.</p>
+
+    <p>Dacă doriți să primiți din nou un email de verificare, faceți click pe butonul de mai jos:</p>
+
+    <button class="btn btn-primary" @onclick="ResendVerificationEmail" disabled="@isResending">
+        @if (isResending)
+        {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="visually-hidden">Se trimite...</span>
+        }
+        else
+        {
+            <span>Trimitere Email de Verificare</span>
+        }
+    </button>
+
+    @if (resendSuccess)
+    {
+        <div class="alert alert-success mt-3" role="alert">
+            Emailul de verificare a fost trimis cu succes. Vă rugăm să verificați căsuța de email.
+        </div>
+        
+        <div class="alert alert-success" role="alert">
+            După ce v-ați verificat email-ul cu succes, logați-vă din nou pentru a avea acces la vot!
+        </div>
+    }
+    @if (resendError)
+    {
+        <div class="alert alert-danger mt-3" role="alert">
+            A apărut o problemă la trimiterea emailului de verificare. Vă rugăm să încercați din nou mai târziu.
+        </div>
+    }
+</div>

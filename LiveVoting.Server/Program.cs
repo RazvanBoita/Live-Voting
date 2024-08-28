@@ -9,12 +9,14 @@ using LiveVoting.Server.Data;
 using LiveVoting.Server.Repositories.Candidate;
 using LiveVoting.Server.Repositories.Election;
 using LiveVoting.Server.Repositories.ElectionRound;
+using LiveVoting.Server.Repositories.UpcomingCandidate;
 using LiveVoting.Server.Repositories.User;
 using LiveVoting.Server.Services.Candidate;
 using LiveVoting.Server.Services.Election;
 using LiveVoting.Server.Services.Email;
 using LiveVoting.Server.Services.Hashing;
 using LiveVoting.Server.Services.Jwt;
+using LiveVoting.Server.Services.UpcomingCandidate;
 using LiveVoting.Server.Services.User;
 using LiveVoting.Server.Validators;
 using LiveVoting.Shared.Models;
@@ -138,6 +140,7 @@ builder.Services.AddScoped<ILoggedUserRepository, LoggedUserRepository>();
 builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
 builder.Services.AddScoped<IElectionRepository, ElectionRepository>();
 builder.Services.AddScoped<IElectionRoundRepository, ElectionRoundRepository>();
+builder.Services.AddScoped<IUpcomingCandidateRepository, UpcomingCandidateRepository>();
 
 
 //TODO Add Others
@@ -149,6 +152,9 @@ builder.Services.AddScoped<ICandidateService, CandidateService>();
 builder.Services.AddScoped<IHashingService, HashingService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IElectionService, ElectionService>();
+builder.Services.AddScoped<IUpcomingCandidateService, UpcomingCandidateService>();
+
+
 
 var app = builder.Build();
 

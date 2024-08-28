@@ -1,0 +1,88 @@
+@page "/vot"
+@using LiveVoting.WasmClient.StateManagement
+@inject AuthStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+@code {
+    private bool isCheckingAuthState = true;
+    private bool isAuthenticated = false;
+    private bool showError = false;
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthStateProvider.CheckAuthStateAsync();
+        isAuthenticated = AuthStateProvider.IsAuthenticated;
+        isCheckingAuthState = false;
+
+        if (!isAuthenticated)
+        {
+            errorMessage = "Nu sunteți autentificat. Veți fi redirecționat către pagina de autentificare.";
+            showError = true;
+            await Task.Delay(3000);
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        // Now check if the user's email is verified
+        var emailVerified = await IsEmailVerified();
+
+        if (!emailVerified)
+        {
+            errorMessage = "Emailul dumneavoastră nu este verificat. Veți fi redirecționat către pagina de autentificare.";
+            showError = true;
+            await Task.Delay(3000);
+            Navigation.NavigateTo("/resend-email-verification");
+        }
+    }
+
+    private async Task<bool> IsEmailVerified()
+    {
+        try
+        {
+            var response = await Http.GetAsync("api/protected"); 
+            if (response.IsSuccessStatusCode)
+            {
+                // Email is verified
+                return true;
+            }
+            else
+            {
+                // Email is not verified or other error occurred
+                return false;
+            }
+        }
+        catch (Exception)
+        {
+            // Handle any exceptions or network errors here
+            return false;
+        }
+    }
+}
+
+@if (isCheckingAuthState)
+{
+    <div class="text-center mt-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-secondary mt-3">Verificăm autentificarea...</p>
+    </div>
+}
+else if (isAuthenticated && !showError)
+{
+    <div class="text-center mt-5">
+        <h1 class="text-success">Bine ați venit la pagina protejată!</h1>
+        <p class="text-muted">Aveți acces pentru că sunteți autentificat și emailul este verificat.</p>
+    </div>
+}
+else if (showError)
+{
+    <div class="alert alert-danger mt-5" role="alert">
+        <h4 class="alert-heading">Acces Refuzat!</h4>
+        <p>@errorMessage</p>
+        <hr>
+        <p class="mb-0">Dacă nu sunteți redirecționat automat, <a href="/login" class="alert-link">faceți click aici</a>.</p>
+    </div>
+}
