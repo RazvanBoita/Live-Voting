@@ -184,6 +184,30 @@ namespace LiveVoting.Server.Migrations
                     b.ToTable("UpcomingCandidates");
                 });
 
+            modelBuilder.Entity("LiveVoting.Server.Models.UpcomingVote", b =>
+                {
+                    b.Property<int>("UpcomingVoteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UpcomingVoteId"));
+
+                    b.Property<int>("UpcomingCandidateId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UpcomingVoteId");
+
+                    b.HasIndex("UpcomingCandidateId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UpcomingVotes");
+                });
+
             modelBuilder.Entity("LiveVoting.Server.Models.User", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -259,6 +283,25 @@ namespace LiveVoting.Server.Migrations
                     b.Navigation("ElectionRound");
                 });
 
+            modelBuilder.Entity("LiveVoting.Server.Models.UpcomingVote", b =>
+                {
+                    b.HasOne("LiveVoting.Server.Models.UpcomingCandidate", "UpcomingCandidate")
+                        .WithMany("UpcomingVotes")
+                        .HasForeignKey("UpcomingCandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LiveVoting.Server.Models.User", "User")
+                        .WithOne("UpcomingVote")
+                        .HasForeignKey("LiveVoting.Server.Models.UpcomingVote", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("UpcomingCandidate");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LiveVoting.Server.Models.Election", b =>
                 {
                     b.Navigation("ElectionRounds");
@@ -269,9 +312,17 @@ namespace LiveVoting.Server.Migrations
                     b.Navigation("Candidates");
                 });
 
+            modelBuilder.Entity("LiveVoting.Server.Models.UpcomingCandidate", b =>
+                {
+                    b.Navigation("UpcomingVotes");
+                });
+
             modelBuilder.Entity("LiveVoting.Server.Models.User", b =>
                 {
                     b.Navigation("LoggedUser");
+
+                    b.Navigation("UpcomingVote")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

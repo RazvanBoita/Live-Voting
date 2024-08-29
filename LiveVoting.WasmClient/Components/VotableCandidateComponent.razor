@@ -1,0 +1,138 @@
+@using LiveVoting.Shared.Dtos
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<div class="card candidate-card mb-3">
+    @if (!string.IsNullOrEmpty(CandidateDto.ImageUrl))
+    {
+        <div class="image-container">
+            <img src="@imageSrc" class="card-img-top candidate-image" alt="@CandidateDto.Name">
+        </div>
+    }
+    <div class="card-body">
+        <h5 class="card-title">@CandidateDto.Name</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@CandidateDto.Party</h6>
+        <button class="btn btn-primary" @onclick="() => VoteAsync(CandidateDto.ImageUrl)" disabled="@(hasVoted)">
+            Votează
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CandidateDto CandidateDto { get; set; }
+
+    private string imageSrc = "loading.gif";
+    private bool hasVoted = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            imageSrc = await LoadImage(CandidateDto.ImageUrl);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+    
+    private async Task<string> LoadImage(string imageUrl)
+    {
+        var toReturn = new byte[]{};
+        try
+        {
+            var imageBytes = await HttpClient.GetByteArrayAsync($"api/s3/buckets/presidential-elections-images/{imageUrl}");
+            toReturn = imageBytes;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+
+        return $"data:image/jpeg;base64,{Convert.ToBase64String(toReturn)}";        
+    }
+    
+    private async Task VoteAsync(string imageUrl)
+    {
+        if (!hasVoted)
+        {
+            try
+            {
+                var response = await HttpClient.PostAsJsonAsync($"api/alegeri-2024/voteaza/{imageUrl}", new { });
+                if (response.IsSuccessStatusCode)
+                {
+                    NavigationManager.NavigateTo("/reloading-vot");
+                    hasVoted = true;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/error");
+                    var msg = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine("Voting failedd:" + msg);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error voting: {ex.Message}");
+            }
+        }
+    }
+}
+
+<style>
+    .candidate-card {
+        width: 300px;
+        height: 450px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        cursor: pointer;
+    }
+
+    .candidate-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .image-container {
+        height: 290px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .candidate-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 160px;
+        overflow-y: auto;
+    }
+
+    .card-title {
+        color: #007bff;
+    }
+
+    .card-subtitle {
+        color: #6c757d;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-primary:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+</style>

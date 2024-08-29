@@ -54,4 +54,45 @@ public class JwtService : IJwtService
         
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public (bool, string) ExtractEmailFromRequestWithToken(HttpRequest request)
+    {
+        var authorizationHeader = request.Headers["Authorization"].FirstOrDefault();
+        if (authorizationHeader == null || !authorizationHeader.StartsWith("Bearer "))
+        {
+            return (false, "Token is missing or invalid.");
+        }
+        var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        var email = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+        if (email is null)
+        {
+            return (false, "Email cant be retrieved from token.");
+        }
+        
+        return (true, email);
+    }
+
+    public (bool, string) ExtractIdFromRequestWithToken(HttpRequest request)
+    {
+        var authorizationHeader = request.Headers["Authorization"].FirstOrDefault();
+        if (authorizationHeader == null || !authorizationHeader.StartsWith("Bearer "))
+        {
+            return (false, "Token is missing or invalid.");
+        }
+        
+        var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        var guid = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+        
+        if (guid is null)
+        {
+            return (false, "User id cant be retrieved from token.");
+        }
+        
+        return (true, guid);
+    }
 }

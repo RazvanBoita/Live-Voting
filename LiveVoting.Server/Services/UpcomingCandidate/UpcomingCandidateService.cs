@@ -65,4 +65,9 @@ public class UpcomingCandidateService : IUpcomingCandidateService
         };
         return dtoCandidate;
     }
+
+    public Models.UpcomingCandidate? GetCandidateByImageUrl(string imageUrl)
+    {
+        return _upcomingCandidateRepository.GetUpcomingCandidateByImageUrl(imageUrl);
+    }
 }

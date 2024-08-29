@@ -8,4 +8,6 @@ public class UpcomingCandidate
     public string Party { get; set; }
     public string Bio { get; set; }
     public string ImageUrl { get; set; }
+
+    public ICollection<UpcomingVote> UpcomingVotes { get; set; } = new List<UpcomingVote>();
 }

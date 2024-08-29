@@ -7,4 +7,5 @@ public interface IUpcomingCandidateService
     public ICollection<CandidateDto> GetCandidates();
     public CandidateDto? GetCandidate(string name);
     public CandidateDto? GetCandidate(int candidateId);
+    public Models.UpcomingCandidate? GetCandidateByImageUrl(string imageUrl);
 }

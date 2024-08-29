@@ -10,4 +10,5 @@ public class User
     public string CNP { get; set; }
     public bool ConfirmedEmail { get; set; }
     public LoggedUser? LoggedUser { get; set; }
+    public UpcomingVote UpcomingVote { get; set; }
 }

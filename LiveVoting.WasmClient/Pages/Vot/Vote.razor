@@ -1,5 +1,6 @@
 @page "/vot"
 @using LiveVoting.WasmClient.StateManagement
+@using LiveVoting.Shared.Dtos
 @inject AuthStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 @inject HttpClient Http
@@ -9,6 +10,8 @@
     private bool isAuthenticated = false;
     private bool showError = false;
     private string errorMessage = string.Empty;
+    private bool hasVoted = false;
+    private CandidateDto votedCandidate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -25,7 +28,6 @@
             return;
         }
 
-        // Now check if the user's email is verified
         var emailVerified = await IsEmailVerified();
 
         if (!emailVerified)
@@ -34,36 +36,70 @@
             showError = true;
             await Task.Delay(3000);
             Navigation.NavigateTo("/resend-email-verification");
+            return;
         }
+
+        // Check if the user has voted
+        var result = await CheckIfUserHasVoted();
+        hasVoted = result.hasVoted;
+        votedCandidate = result.candidate;
     }
 
     private async Task<bool> IsEmailVerified()
     {
         try
         {
-            var response = await Http.GetAsync("api/protected"); 
+            var response = await Http.GetAsync("api/protected");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    private async Task<(bool hasVoted, CandidateDto candidate)> CheckIfUserHasVoted()
+    {
+        try
+        {
+            var response = await Http.GetAsync("api/alegeri-2024/voteaza");
+
             if (response.IsSuccessStatusCode)
             {
-                // Email is verified
-                return true;
+                var candidateDto = await response.Content.ReadFromJsonAsync<CandidateDto>();
+                return (true, candidateDto);
             }
             else
             {
-                // Email is not verified or other error occurred
-                return false;
+                return (false, null);
             }
         }
         catch (Exception)
         {
-            // Handle any exceptions or network errors here
-            return false;
+            return (false, null);
+        }
+    }
+
+    private async Task DeleteVote()
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"api/alegeri-2024/voteaza/{votedCandidate.ImageUrl}"); 
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/reloading-vot"); // Refresh the page
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle error (e.g., show a message to the user)
         }
     }
 }
 
 @if (isCheckingAuthState)
 {
-    <div class="text-center mt-5">
+    <div class="mt-5">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
@@ -72,9 +108,32 @@
 }
 else if (isAuthenticated && !showError)
 {
-    <div class="text-center mt-5">
-        <h1 class="text-success">Bine ați venit la pagina protejată!</h1>
-        <p class="text-muted">Aveți acces pentru că sunteți autentificat și emailul este verificat.</p>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8">
+                @if (hasVoted)
+                {
+                    <div>
+                        <h1 class="text-success">Ați votat!</h1>
+                        <p class="text-muted">Ați votat pentru candidatul:</p>
+                        <CandidateComponent CandidateDto="votedCandidate"></CandidateComponent>
+
+                        <!-- Buttons for managing votes -->
+                        <div class="mt-4">
+                            <button class="btn btn-danger me-2" @onclick="DeleteVote">Șterge votul</button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        <h1 class="text-success">Bine ați venit la vot!</h1>
+                        <p class="text-muted">Aici va puteti exprima intentia de vot, sigur si rapid!</p>
+                        <VoteComponent></VoteComponent>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 }
 else if (showError)

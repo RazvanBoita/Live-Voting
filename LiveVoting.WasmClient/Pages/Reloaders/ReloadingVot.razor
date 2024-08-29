@@ -1,0 +1,10 @@
+@page "/reloading-vot"
+@inject NavigationManager NavigationManager
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.NavigateTo("/vot");
+    }
+}

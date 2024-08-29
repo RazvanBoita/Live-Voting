@@ -26,4 +26,9 @@ public class UpcomingCandidateRepository : IUpcomingCandidateRepository
     {
         return _dbContext.UpcomingCandidates.FirstOrDefault(uc => uc.Name.ToLower().Contains(name.ToLower()));
     }
+
+    public Models.UpcomingCandidate? GetUpcomingCandidateByImageUrl(string imageUrl)
+    {
+        return _dbContext.UpcomingCandidates.FirstOrDefault(uc => String.Equals(uc.ImageUrl.ToLower(), imageUrl.ToLower()));
+    }
 }

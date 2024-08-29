@@ -1,0 +1,71 @@
+@using LiveVoting.Shared.Dtos
+@using LiveVoting.WasmClient.StateManagement
+@inject AuthStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+@code {
+    private bool isCheckingAuthState = true;
+    private bool isAuthenticated = false;
+    private List<CandidateDto> candidates = new List<CandidateDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthStateProvider.CheckAuthStateAsync();
+        isAuthenticated = AuthStateProvider.IsAuthenticated;
+        isCheckingAuthState = false;
+
+        if (!isAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            await LoadCandidatesAsync();
+        }
+    }
+
+    private async Task LoadCandidatesAsync()
+    {
+        try
+        {
+            candidates = await Http.GetFromJsonAsync<List<CandidateDto>>("api/alegeri-2024/candidati");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching candidates: {ex.Message}");
+        }
+    }
+
+    
+}
+
+@if (isCheckingAuthState)
+{
+    <div class="text-center mt-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-secondary mt-3">Verificăm autentificarea...</p>
+    </div>
+}
+else if (isAuthenticated)
+{
+    <h3>Acestia sunt cativa dintre potentialii candidati la alegerile din 2024.</h3>
+
+    @if (candidates?.Any() == true)
+    {
+        <div class="row w-100 flex align-items-center justify-content-between">
+            @foreach (var candidate in candidates)
+            {
+                <div class="col-md-4">
+                    <VotableCandidateComponent CandidateDto="candidate" />
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>Nu există candidați disponibili momentan.</p>
+    }
+}

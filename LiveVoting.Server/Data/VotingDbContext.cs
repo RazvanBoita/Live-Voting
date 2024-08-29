@@ -16,6 +16,7 @@ public class VotingDbContext : DbContext
     public DbSet<ElectionRound> ElectionRounds { get; set; }
     public DbSet<RoundCandidate> RoundCandidates { get; set; }
     public DbSet<UpcomingCandidate> UpcomingCandidates { get; set; }
+    public DbSet<UpcomingVote> UpcomingVotes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,5 +48,20 @@ public class VotingDbContext : DbContext
             .WithMany()
             .HasForeignKey(rc => rc.CandidateId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        //Vote to User one to one
+        modelBuilder.Entity<UpcomingVote>()
+            .HasOne(uv => uv.User)
+            .WithOne(u => u.UpcomingVote)
+            .HasForeignKey<UpcomingVote>(uv => uv.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        //Vote to UpcomingCandidate many to one
+        modelBuilder.Entity<UpcomingVote>()
+            .HasOne(uv => uv.UpcomingCandidate)
+            .WithMany(uc => uc.UpcomingVotes)
+            .HasForeignKey(uv => uv.UpcomingCandidateId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
     }
 }

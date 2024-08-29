@@ -1,11 +1,71 @@
 @page "/rezultate"
 @using LiveVoting.WasmClient.StateManagement
+@using System.Net.Http.Json
+@using LiveVoting.Shared.Dtos
 @inject AuthStateProvider AuthStateProvider
 @inject NavigationManager Navigation
+@inject HttpClient Http
+
+<style>
+    .my-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .candidate-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        border-radius: 15px;
+        background: linear-gradient(145deg, #f0f0f0, #ffffff);
+        box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+        transition: all 0.3s ease;
+        width: 60%;
+    }
+
+    .candidate-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 25px 25px 75px #a1a1a1, -25px -25px 75px #ffffff;
+    }
+
+    .vote-count {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #4a4a4a;
+        margin-left: 2rem;
+        padding: 0.5rem 1rem;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #ffffff, #e6e6e6);
+        box-shadow: 5px 5px 15px #d1d1d1, -5px -5px 15px #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100px;
+        height: 100px;
+        transition: all 0.3s ease;
+    }
+
+    .vote-count:hover {
+        color: #3498db;
+        transform: scale(1.05);
+    }
+
+    .vote-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7f8c8d;
+        margin-top: 0.5rem;
+    }
+</style>
 
 @code {
     private bool isCheckingAuthState = true;
     private bool isAuthenticated = false;
+    private List<CandidateDto> candidates;
+    private Dictionary<string, int> voteCounts = new Dictionary<string, int>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -17,6 +77,26 @@
         {
             Navigation.NavigateTo("/login");
         }
+        else
+        {
+            await LoadCandidatesAsync();
+        }
+    }
+
+    private async Task LoadCandidatesAsync()
+    {
+        candidates = await Http.GetFromJsonAsync<List<CandidateDto>>("api/alegeri-2024/candidati");
+
+        foreach (var candidate in candidates)
+        {
+            voteCounts[candidate.ImageUrl] = await GetVoteCountAsync(candidate.ImageUrl);
+        }
+    }
+
+    private async Task<int> GetVoteCountAsync(string imageUrl)
+    {
+        var response = await Http.GetFromJsonAsync<int>($"api/provizorii/{imageUrl}");
+        return response;
     }
 }
 
@@ -31,6 +111,26 @@
 }
 else if (isAuthenticated)
 {
-    <h3>Rezultate24</h3>
-    <p>Bine ați venit la pagina de rezultate pentru alegerile din 2024.</p>
+    <h3 class="text-center mb-0 mt-2 text-info fw-bold">Rezultate Provizorii 2024</h3>
+    <br/>
+    @if (candidates == null)
+    {
+        <p>Se încarcă candidații...</p>
+    }
+    else
+    {
+        <div class="container my-container mt-3">
+            @foreach (var candidate in candidates)
+            {
+                <div class="candidate-container">
+                    <CandidateComponent CandidateDto="candidate" />
+                    @* <button class="btn-primary" @onclick='@() => Navigation.NavigateTo("vot")'>Voteaza</button> *@
+                    <div class="vote-count">
+                        @voteCounts[candidate.ImageUrl]
+                        <div class="vote-label">voturi</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 }
