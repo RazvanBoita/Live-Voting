@@ -6,6 +6,7 @@ using Amazon.Runtime;
 using Amazon.S3;
 using FluentValidation;
 using LiveVoting.Server.Data;
+using LiveVoting.Server.Hubs;
 using LiveVoting.Server.Repositories.Candidate;
 using LiveVoting.Server.Repositories.Election;
 using LiveVoting.Server.Repositories.ElectionRound;
@@ -36,6 +37,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 var clientAddress = builder.Configuration["Client"] ?? throw new ApplicationException("Client is missing from configuration");
 Console.WriteLine("Client address in server is: " + clientAddress);
+
+builder.Services.AddSignalR(d =>
+{
+    d.EnableDetailedErrors = true;
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowEverybody",
@@ -83,6 +90,7 @@ builder.Services.AddAWSService<IAmazonS3>(new AWSOptions
     Credentials = new BasicAWSCredentials(builder.Configuration["s3Id"], builder.Configuration["s3key"]),
     Region = RegionEndpoint.EUNorth1
 });
+
 
 
 builder.Services.AddAuthentication(options =>
@@ -171,12 +179,17 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowEverybody");
+app.UseRouting();
+
+
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+
 app.MapControllers();
 
+app.MapHub<VotingHub>("/votehub");
 
 app.Run();
 

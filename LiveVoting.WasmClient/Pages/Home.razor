@@ -54,7 +54,9 @@
                 <div class="timeline-panel">
                     <div class="timeline-heading">
                         <h4 class="timeline-title">Începerea Campaniei</h4>
-                        <p><small class="text-muted"><i class="fas fa-clock"></i> 1 Septembrie 2024</small></p>
+                        <p>
+                            <small class="text-muted"><i class="fas fa-clock"></i> 1 Septembrie 2024</small>
+                        </p>
                     </div>
                     <div class="timeline-body">
                         <p>Demararea oficială a campaniei electorale pentru alegerile prezidențiale.</p>
@@ -66,7 +68,9 @@
                 <div class="timeline-panel">
                     <div class="timeline-heading">
                         <h4 class="timeline-title">Ziua Votului</h4>
-                        <p><small class="text-muted"><i class="fas fa-clock"></i> 10 Noiembrie 2024</small></p>
+                        <p>
+                            <small class="text-muted"><i class="fas fa-clock"></i> 10 Noiembrie 2024</small>
+                        </p>
                     </div>
                     <div class="timeline-body">
                         <p>Cetățenii își exercită dreptul la vot în cadrul primului tur al alegerilor.</p>
@@ -78,7 +82,9 @@
                 <div class="timeline-panel">
                     <div class="timeline-heading">
                         <h4 class="timeline-title">Al Doilea Tur (dacă este necesar)</h4>
-                        <p><small class="text-muted"><i class="fas fa-clock"></i> 24 Noiembrie 2024</small></p>
+                        <p>
+                            <small class="text-muted"><i class="fas fa-clock"></i> 24 Noiembrie 2024</small>
+                        </p>
                     </div>
                     <div class="timeline-body">
                         <p>În cazul în care niciun candidat nu obține majoritatea absolută, se organizează turul doi.</p>
@@ -90,8 +96,8 @@
 </div>
 
 @code {
-private void NavigateToVote() => NavigationManager.NavigateTo("/vot");
-private void NavigateToInfo() => NavigationManager.NavigateTo("/informatii");
-private void NavigateToResults() => NavigationManager.NavigateTo("/rezultate");
-private void NavigateToFAQ() => NavigationManager.NavigateTo("https://votcorect.ro/prezidentiale-2019/faq/");
+    private void NavigateToVote() => NavigationManager.NavigateTo("/vot");
+    private void NavigateToInfo() => NavigationManager.NavigateTo("/informatii");
+    private void NavigateToResults() => NavigationManager.NavigateTo("/rezultate");
+    private void NavigateToFAQ() => NavigationManager.NavigateTo("https://votcorect.ro/prezidentiale-2019/faq/");
 }

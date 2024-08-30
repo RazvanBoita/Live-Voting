@@ -1,9 +1,11 @@
+using LiveVoting.Server.Hubs;
 using LiveVoting.Server.Services.Jwt;
 using LiveVoting.Server.Services.UpcomingCandidate;
 using LiveVoting.Server.Services.Voting;
 using LiveVoting.Shared.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace LiveVoting.Server.Controllers.Voting;
 
@@ -15,18 +17,19 @@ public class VotingController : ControllerBase
     private readonly IUpcomingCandidateService _upcomingCandidateService;
     private readonly IJwtService _jwtService;
     private readonly IVotingService _votingService;
-    
+    private readonly IHubContext<VotingHub> _hubContext;
 
-    public VotingController(IUpcomingCandidateService upcomingCandidateService, IJwtService jwtService, IVotingService votingService)
+    public VotingController(IUpcomingCandidateService upcomingCandidateService, IJwtService jwtService, IVotingService votingService, IHubContext<VotingHub> hubContext)
     {
         _upcomingCandidateService = upcomingCandidateService;
         _jwtService = jwtService;
         _votingService = votingService;
+        _hubContext = hubContext;
     }
     
     
     [HttpPost("{imageUrl}")]
-    public IActionResult AddVote(string imageUrl)
+    public async Task<IActionResult> AddVote(string imageUrl)
     {
         var result = _jwtService.ExtractIdFromRequestWithToken(Request);
         if (!result.Item1)
@@ -43,11 +46,13 @@ public class VotingController : ControllerBase
             return BadRequest(voteResult.Item2);
         }
         
+        var newVoteCount = _votingService.GetVotesCountForCandidate(votedCandidate);
+        await _hubContext.Clients.All.SendAsync("ReceiveVoteUpdate", imageUrl, newVoteCount);
         return Ok(voteResult.Item2);
     }
     
     [HttpDelete("{imageUrl}")]
-    public IActionResult DeleteVote(string imageUrl)
+    public async Task<IActionResult> DeleteVote(string imageUrl)
     {
         var result = _jwtService.ExtractIdFromRequestWithToken(Request);
         if (!result.Item1)
@@ -64,6 +69,8 @@ public class VotingController : ControllerBase
             return BadRequest(voteResult.Item2);
         }
         
+        var newVoteCount = _votingService.GetVotesCountForCandidate(votedCandidate);
+        await _hubContext.Clients.All.SendAsync("ReceiveVoteUpdate", imageUrl, newVoteCount);
         return Ok(voteResult.Item2);
     }
 

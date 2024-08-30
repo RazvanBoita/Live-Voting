@@ -84,7 +84,7 @@
     {
         try
         {
-            var response = await Http.DeleteAsync($"api/alegeri-2024/voteaza/{votedCandidate.ImageUrl}"); 
+            var response = await Http.DeleteAsync($"api/alegeri-2024/voteaza/{votedCandidate.ImageUrl}");
             if (response.IsSuccessStatusCode)
             {
                 Navigation.NavigateTo("/reloading-vot"); // Refresh the page
@@ -95,6 +95,7 @@
             // Handle error (e.g., show a message to the user)
         }
     }
+
 }
 
 @if (isCheckingAuthState)

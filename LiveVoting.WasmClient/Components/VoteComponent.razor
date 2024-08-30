@@ -37,7 +37,7 @@
         }
     }
 
-    
+
 }
 
 @if (isCheckingAuthState)
@@ -59,7 +59,7 @@ else if (isAuthenticated)
             @foreach (var candidate in candidates)
             {
                 <div class="col-md-4">
-                    <VotableCandidateComponent CandidateDto="candidate" />
+                    <VotableCandidateComponent CandidateDto="candidate"/>
                 </div>
             }
         </div>

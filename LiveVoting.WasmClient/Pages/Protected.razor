@@ -2,19 +2,20 @@
 @inject HttpClient HttpClient
 
 
-<EditForm Model = "@HttpClient" OnValidSubmit="CallProtectedEndpointForVerifiedUsers" FormName="protected-form">
+<EditForm Model="@HttpClient" OnValidSubmit="CallProtectedEndpointForVerifiedUsers" FormName="protected-form">
     <button type="submit" class="btn btn-primary">Check protected for verified users</button>
 </EditForm>
 
-<EditForm Model = "@HttpClient" OnValidSubmit="CallProtectedEndpointForAuthenticatedUsers" FormName="protected-form">
+<EditForm Model="@HttpClient" OnValidSubmit="CallProtectedEndpointForAuthenticatedUsers" FormName="protected-form">
     <button type="submit" class="btn btn-primary">Check protected for authenticated users</button>
 </EditForm>
 
 @code {
+
     private async Task CallProtectedEndpointForVerifiedUsers()
     {
         var response = await HttpClient.GetAsync("http://localhost:5005/api/protected");
-        
+
         if (response.IsSuccessStatusCode)
         {
             var result = await response.Content.ReadAsStringAsync();
@@ -39,4 +40,5 @@
             Console.WriteLine("Request failed");
         }
     }
+
 }

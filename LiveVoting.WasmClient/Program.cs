@@ -19,10 +19,8 @@ builder.Services.AddScoped<AuthStateProvider>();
 
 builder.Services.AddTransient<AuthorizationMessageHandler>();
 
-builder.Services.AddHttpClient("BackendAPI", client =>
-{
-    client.BaseAddress = new Uri(serverAddress);
-}).AddHttpMessageHandler<AuthorizationMessageHandler>();
+builder.Services.AddHttpClient("BackendAPI", client => { client.BaseAddress = new Uri(serverAddress); })
+    .AddHttpMessageHandler<AuthorizationMessageHandler>();
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("BackendAPI"));
 

@@ -9,12 +9,13 @@
     {
         candidates = await Http.GetFromJsonAsync<List<CandidateDto>>("api/alegeri-2024/candidati");
     }
+
 }
 
 <div class="container mt-5">
     <h1 class="text-center text-primary">Lista Potențialilor Candidați pentru Alegerile Prezidențiale 2024</h1>
     <p class="text-center text-secondary">Această pagină servește ca o listă de potențiali candidați pentru următoarele alegeri prezidențiale. Fiecare candidat afișat mai jos reprezintă o opțiune posibilă pentru funcția de Președinte al României în anul 2024.</p>
-    
+
     @if (candidates == null)
     {
         <div class="text-center text-warning">
@@ -37,7 +38,7 @@
             @foreach (var candidate in candidates)
             {
                 <div class="col-md-4">
-                    <CandidateComponent CandidateDto="candidate" />
+                    <CandidateComponent CandidateDto="candidate"/>
                 </div>
             }
         </div>

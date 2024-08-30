@@ -16,8 +16,9 @@ public class AuthStateProvider
     private readonly IJSRuntime _jsRuntime;
     public bool IsAuthenticated { get; private set; }
     public event Action OnAuthStateChanged;
-    
-    public AuthStateProvider(ILocalStorageService localStorage, NavigationManager navigationManager, HttpClient httpClient, IJSRuntime jsRuntime)
+
+    public AuthStateProvider(ILocalStorageService localStorage, NavigationManager navigationManager,
+        HttpClient httpClient, IJSRuntime jsRuntime)
     {
         _localStorage = localStorage;
         _navigationManager = navigationManager;
@@ -35,6 +36,7 @@ public class AuthStateProvider
             OnAuthStateChanged?.Invoke();
             return;
         }
+
         var jwtToken = new JwtSecurityToken(token);
         var isInvalidToken = jwtToken.ValidFrom > DateTime.UtcNow || jwtToken.ValidTo < DateTime.UtcNow;
         Console.WriteLine("Is invalid? " + isInvalidToken);
@@ -45,13 +47,13 @@ public class AuthStateProvider
             var guidClaim = JwtService.GetGuidClaimFromToken(token);
             var uri = $"/api/logout/{guidClaim}";
             var response = await _httpClient.PostAsJsonAsync(uri, "");
-            
-            
+
+
             IsAuthenticated = false;
             OnAuthStateChanged?.Invoke();
             return;
         }
-        
+
         IsAuthenticated = true;
         OnAuthStateChanged?.Invoke();
     }
@@ -62,6 +64,5 @@ public class AuthStateProvider
         IsAuthenticated = false;
         OnAuthStateChanged?.Invoke();
         _navigationManager.NavigateTo("/login");
-        
     }
 }
